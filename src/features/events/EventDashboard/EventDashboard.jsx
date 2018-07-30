@@ -9,7 +9,7 @@ const events = [
   {
     id: '1',
     title: 'Trip to Tower of London',
-    date: '2018-03-27T11:00:00+00:00',
+    date: '2018-03-27',
     category: 'culture',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
@@ -33,7 +33,7 @@ const events = [
   {
     id: '2',
     title: 'Trip to Punch and Judy Pub',
-    date: '2018-03-28T14:00:00+00:00',
+    date: '2018-03-28',
     category: 'drinks',
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sollicitudin ligula eu leo tincidunt, quis scelerisque magna dapibus. Sed eget ipsum vel arcu vehicula ullamcorper.',
@@ -59,10 +59,12 @@ const events = [
 class EventDashboard extends Component {
   state = {
     events,
-    isOpen: false
+    isOpen: false,
+    selectedEvent: null
   };
   handleFormOpen() {
     this.setState({
+      selectedEvent: null,
       isOpen: true
     });
   }
@@ -71,6 +73,34 @@ class EventDashboard extends Component {
       isOpen: false
     });
   }
+
+  //{...object} == Object.assign({},updatedEvent)
+
+  handleUpdateEvent = updatedEvent => {
+    const events = this.state.events.map(event => {
+      if (event.id === updatedEvent.id) {
+        return { ...updatedEvent };
+      } else {
+        return event;
+      }
+    });
+    this.setState({ events, isOpen: false, selectedEvent: null });
+  };
+
+  handleOpenEvent = eventToOpen => evt => {
+    this.setState({
+      selectedEvent: eventToOpen,
+      isOpen: true
+    });
+  };
+
+  handleDeleteEvent = eventId => () => {
+    console.log('delete event called');
+    const events = this.state.events.filter(event => event.id !== eventId);
+    this.setState({
+      events
+    });
+  };
 
   handleCreateEvent = newEvent => {
     newEvent.id = cuid();
@@ -84,11 +114,16 @@ class EventDashboard extends Component {
   };
 
   render() {
+    const { selectedEvent } = this.state;
     return (
       <Grid>
         <Grid.Column width={10}>
           <h2>Event List</h2>
-          <EventList events={this.state.events} />
+          <EventList
+            onEventOpen={this.handleOpenEvent}
+            deleteEvent={this.handleDeleteEvent}
+            events={this.state.events}
+          />
         </Grid.Column>
 
         <Grid.Column width={6}>
@@ -99,8 +134,10 @@ class EventDashboard extends Component {
           />
           {this.state.isOpen && (
             <EventForm
+              selectedEvent={selectedEvent}
               handleCreateEvent={this.handleCreateEvent}
               handleCancel={this.handleFormCancel.bind(this)}
+              handleUpdateEvent={this.handleUpdateEvent}
             />
           )}
         </Grid.Column>

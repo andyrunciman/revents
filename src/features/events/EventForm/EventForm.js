@@ -1,15 +1,36 @@
 import React, { Component } from 'react';
 import { Form, Segment, Button } from 'semantic-ui-react';
+
+const emptyEvent = {
+  title: '',
+  date: '',
+  city: '',
+  venue: '',
+  hostedBy: ''
+};
+
 export default class EventForm extends Component {
   state = {
-    event: {
-      title: '',
-      date: '',
-      city: '',
-      venue: '',
-      hostedBy: ''
-    }
+    event: emptyEvent
   };
+
+  componentDidMount() {
+    if (this.props.selectedEvent !== null) {
+      this.setState({
+        event: this.props.selectedEvent
+      });
+    }
+  }
+
+  //this will call two renders
+  //we could look at the state
+  componentDidUpdate(prevProps) {
+    if (this.props.selectedEvent !== prevProps.selectedEvent) {
+      this.setState({
+        event: this.props.selectedEvent || emptyEvent
+      });
+    }
+  }
 
   handleChange = evt => {
     const { name, value } = evt.target;
@@ -22,8 +43,15 @@ export default class EventForm extends Component {
 
   onFormSubmit = event => {
     event.preventDefault();
-    console.log(this.state.event);
-    this.props.handleCreateEvent({ ...this.state.event });
+    if (this.state.event.id) {
+      //we know this is an update if it has an id
+      //this should be this.props.updateEvent as the handleUpdateEvent
+      //is the actual method that handles it.
+      this.props.handleUpdateEvent(this.state.event);
+    } else {
+      this.props.handleCreateEvent({ ...this.state.event });
+    }
+
     //console.log(this.myRef.current.value);
   };
 
@@ -38,7 +66,7 @@ export default class EventForm extends Component {
             <label>Event Title</label>
             <input
               onChange={this.handleChange}
-              value={this.state.title}
+              value={this.state.event.title}
               placeholder="First Name"
               name="title"
             />
@@ -50,6 +78,7 @@ export default class EventForm extends Component {
               name="date"
               type="date"
               placeholder="Event Date"
+              value={this.state.event.date}
             />
           </Form.Field>
           <Form.Field>
@@ -58,6 +87,7 @@ export default class EventForm extends Component {
               onChange={this.handleChange}
               name="city"
               placeholder="City event is taking place"
+              value={this.state.event.city}
             />
           </Form.Field>
           <Form.Field>
@@ -66,6 +96,7 @@ export default class EventForm extends Component {
               onChange={this.handleChange}
               name="venue"
               placeholder="Enter the Venue of the event"
+              value={this.state.event.venue}
             />
           </Form.Field>
           <Form.Field>
@@ -74,6 +105,7 @@ export default class EventForm extends Component {
               name="hostedBy"
               onChange={this.handleChange}
               placeholder="Enter the name of person hosting"
+              value={this.state.event.hostedBy}
             />
           </Form.Field>
           <Button positive type="submit">
