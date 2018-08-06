@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { connect } from 'react-redux';
 const AccountPage = () => {
   return (
     <div>
@@ -8,4 +8,8 @@ const AccountPage = () => {
   );
 };
 
-export default AccountPage;
+const mapStateToProps = state => ({
+  data: state.test.data
+});
+
+export default connect(mapStateToProps)(AccountPage);
