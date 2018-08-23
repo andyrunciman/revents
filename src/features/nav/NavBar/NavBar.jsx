@@ -17,6 +17,9 @@ class NavBar extends Component {
     this.setState({ authenticated: false });
     this.props.history.push('/');
   };
+  //issue with relative url
+  //  /assets/image <- relative to root http://www.abc.com/assets/i,ages
+  //  assets/image <-relative to current directory  http://www.abc.com/test/assets/images
   render() {
     const { authenticated } = this.state;
     return (

@@ -1,35 +1,15 @@
 import React, { Component } from 'react';
 import { Form, Segment, Button } from 'semantic-ui-react';
-
-const emptyEvent = {
-  title: '',
-  date: '',
-  city: '',
-  venue: '',
-  hostedBy: ''
-};
-
-export default class EventForm extends Component {
+import { connect } from 'react-redux';
+import { createEvent, updateEvent } from '../eventActions';
+import cuid from 'cuid';
+class EventForm extends Component {
   state = {
-    event: emptyEvent
+    event: { ...this.props.event }
   };
 
-  componentDidMount() {
-    if (this.props.selectedEvent !== null) {
-      this.setState({
-        event: this.props.selectedEvent
-      });
-    }
-  }
-
-  //this will call two renders
-  //we could look at the state
-  componentDidUpdate(prevProps) {
-    if (this.props.selectedEvent !== prevProps.selectedEvent) {
-      this.setState({
-        event: this.props.selectedEvent || emptyEvent
-      });
-    }
+  componentWillUnmount() {
+    console.log('form is unmounting');
   }
 
   handleChange = evt => {
@@ -47,9 +27,15 @@ export default class EventForm extends Component {
       //we know this is an update if it has an id
       //this should be this.props.updateEvent as the handleUpdateEvent
       //is the actual method that handles it.
-      this.props.handleUpdateEvent(this.state.event);
+      this.props.updateEvent(this.state.event);
+      this.props.history.goBack();
     } else {
-      this.props.handleCreateEvent({ ...this.state.event });
+      this.props.createEvent({
+        ...this.state.event,
+        id: cuid(),
+        hostPhotoURL: '/assets/user.png'
+      });
+      this.props.history.push('/events');
     }
 
     //console.log(this.myRef.current.value);
@@ -111,7 +97,7 @@ export default class EventForm extends Component {
           <Button positive type="submit">
             Submit
           </Button>
-          <Button onClick={handleCancel} type="button">
+          <Button onClick={this.props.history.goBack} type="button">
             Cancel
           </Button>
         </Form>
@@ -119,3 +105,24 @@ export default class EventForm extends Component {
     );
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  const eventId = ownProps.match.params.id;
+  let event = {
+    title: '',
+    date: '',
+    city: '',
+    venue: '',
+    hostedBy: '',
+    attendees: []
+  };
+  if (eventId && state.events.length > 0) {
+    event = state.events.find(event => event.id === eventId);
+  }
+  return { event };
+};
+
+export default connect(
+  mapStateToProps,
+  { createEvent, updateEvent }
+)(EventForm);

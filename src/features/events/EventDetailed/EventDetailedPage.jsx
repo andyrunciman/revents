@@ -1,9 +1,33 @@
 import React from 'react';
-//Stateless functional component
-const EventDetailedPage = () => (
-  <div>
-    <h1>Event Detailed</h1>
-  </div>
+import { connect } from 'react-redux';
+import EventDetailedHeader from './EventDetailedHeader';
+import EventDetailedSidebar from './EventDetailedSidebar';
+import { Grid } from 'semantic-ui-react';
+import EventDetailedInfo from './EventDetailedInfo';
+import EventDetailedChat from './EventDetailedChat';
+
+const mapStateToProps = (state, ownProps) => {
+  const eventId = ownProps.match.params.id;
+  let event = {};
+  if (eventId && state.events.length > 0) {
+    event = state.events.find(event => event.id === eventId);
+  }
+  return {
+    event
+  };
+};
+
+const EventDetailedPage = ({ event }) => (
+  <Grid>
+    <Grid.Column width={10}>
+      <EventDetailedHeader event={event} />
+      <EventDetailedInfo event={event} />
+      <EventDetailedChat />
+    </Grid.Column>
+    <Grid.Column width={6}>
+      <EventDetailedSidebar attendees={event.attendees} />
+    </Grid.Column>
+  </Grid>
 );
 
-export default EventDetailedPage;
+export default connect(mapStateToProps)(EventDetailedPage);

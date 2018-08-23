@@ -20,12 +20,13 @@ class App extends Component {
             <Container className="main">
               <NavBar />
               <Switch>
-                <Route path="/events" component={EventDashboard} />
+                <Route exact path="/events" component={EventDashboard} />
                 <Route path="/events/:id" component={EventDetailedPage} />
                 <Route path="/people" component={PeopleDashboard} />
                 <Route path="/profile/:id" component={UserDetailedPage} />
                 <Route path="/settings" component={SettingsDashboard} />
                 <Route path="/createEvent" component={EventForm} />
+                <Route path="/manage/:id" component={EventForm} />
                 <Route render={() => <h1>Not found</h1>} />
               </Switch>
             </Container>
